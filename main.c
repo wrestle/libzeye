@@ -1,13 +1,13 @@
 #include "test/test.h"
 
 int main(int argc, char* argv[]) {
-    //user_t tmp = make_users("wsxinchina@gmail.com", "WSX88619973wsx");
+    //user_t tmp = make_users("", "");
     //test_res_info(tmp); /* Pass */
     //test_host_search(tmp); /* Pass */
     //test_web_search(tmp); /* Pass */
     //destroy_users(tmp);
     boolean status;
-    zeye_obj_t me = login("wsxinchina@gmail.com", "WSX88619973wsx", 0);
+    zeye_obj_t me = login("username@email.com", "password", 0);
     fputs("C1<<<<<<<<<<<<<<<<<<<<<\n", stderr);
     status = fetch_account_info(me);
     if (FALSE == status) {
