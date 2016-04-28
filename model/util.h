@@ -5,7 +5,14 @@
 #ifndef LIBZEYE_UTIL_H
 #define LIBZEYE_UTIL_H
 
-#include "../base.h"
+#include "base.h"
+#include <json-c/json.h>
+#include <json-c/bits.h>
+
+typedef struct {
+    int    error_code;
+    char * err_massage;
+}message;
 
 typedef enum {
    OVERFLOW = 0,
@@ -34,5 +41,10 @@ typedef struct rep_status* rep_status_t;
  * Cut/Parse the Response Page,
  * remain the Content and status_code
  * */
-boolean deal_response(char * restrict response , rep_status_t restrict rep);
+boolean deal_response(char * response , rep_status_t rep);
+
+void match_err_detail(int err_code, char ** result);
+
+json_object* parse_response(const char * json);
+void rel_rep_data(json_object* free);
 #endif //LIBZEYE_UTIL_H

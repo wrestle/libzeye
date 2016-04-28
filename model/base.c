@@ -78,7 +78,7 @@ static void set_access_token(user_t users) {
 #undef ACCESS_TOKEN_LEN
 }
 
-static inline int set_username(user_t restrict users, const char * restrict name) {
+static inline int set_username(user_t users, const char * name) {
     int len = strlen(name);
     char * local = malloc(len + 1);
     if(unlikely(local == NULL))
@@ -88,7 +88,7 @@ static inline int set_username(user_t restrict users, const char * restrict name
     users->username = local;
 }
 
-static inline int set_password(user_t restrict users, const char * restrict pword) {
+static inline int set_password(user_t users, const char * pword) {
     int len = strlen(pword);
     char * local = malloc(len + 1);
     if(unlikely(local == NULL))
@@ -98,9 +98,11 @@ static inline int set_password(user_t restrict users, const char * restrict pwor
     users->password = local;
 }
 
-user_t make_users(const char * restrict username, const char * restrict password) {
+user_t make_users(const char * username, const char * password) {
     api_uri = "api.zoomeye.org";
     user_t local = malloc(sizeof (struct user));
+    if (unlikely(local == NULL))
+        return NULL;
     set_username(local, username);
     set_password(local, password);
     set_access_token(local);
@@ -114,8 +116,13 @@ void destroy_users(user_t frees) {
     close((int)frees->comm_hook);
 }
 
+void re_connect(user_t re) {
+    free(re->access_token);
+    set_access_token(re);
+}
+
 #if defined(WSX_RELEASE)
-boolean change_user(user_t * restrict old_usr, const char * restrict username, const char * restrict password) {
+boolean change_user(user_t * old_usr, const char * username, const char * password) {
     user_t local = make_users(username, password);
     if (unlikely(local == NULL)) {
         return FALSE;

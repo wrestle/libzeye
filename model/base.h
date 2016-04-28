@@ -22,9 +22,10 @@ typedef struct user * user_t;
 typedef char boolean;
 
 /* Create a new User, make connect to the ZoomEye */
-user_t make_users(const char * restrict username, const char * restrict password);
+user_t make_users(const char * username, const char * password);
 void destroy_users(user_t frees);
+void re_connect(user_t re);
 #if defined(WSX_RELEASE)
-boolean change_user(user_t * restrict old_usr, const char * restrict username, const char * restrict password);
+boolean change_user(user_t * old_usr, const char * username, const char * password);
 #endif
 #endif //LIBZEYE_BASE_H

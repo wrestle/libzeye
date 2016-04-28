@@ -14,3 +14,7 @@ void test_host_search(user_t user) {
 void test_web_search(user_t user) {
     web_search(user, "port:21", "1", "webapp,os");
 }
+
+void test_fetch(zeye_obj_t user) {
+
+}
