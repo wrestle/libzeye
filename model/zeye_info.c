@@ -16,7 +16,7 @@ static char * make_request(const user_t user,
                           const char * content) {
 #define res_len (strlen(resource_info)+strlen(api_uri)+(strlen(attribute))+strlen(content)+40)
     /* For Space Calculation */
-    char * request = malloc(res_len);
+    char * request = calloc(res_len, 1);
     if (unlikely(request == NULL))
         return NULL;
     int size = snprintf(request, res_len, "GET %s HTTP/1.1\r\nHost:%s\r\nAuthorization: %s\r\n%s",
@@ -48,8 +48,11 @@ Retry:
     if (unlikely(request == NULL)) {
         re_connect(user);
         times++;
-        if (times >= 3)
-            return (message){.error_code = -1, .err_massage = "Time Out"};
+        if (times >= 3) {
+            char * tmp = calloc(9,1);
+            strcpy(tmp, "Time Out");
+            return (message) {.error_code = -1, .err_massage = "Time Out"};
+        }
         goto Retry;
     }
     struct rep_status status;

@@ -27,7 +27,7 @@ static const char * err_message[] = {
 int expand_(void ** old, int * old_len) {
     int len = *old_len;
     len <<= 1;
-    char * local = malloc(len);
+    char * local = calloc(len,1);
     if (unlikely(local == NULL)) {
         err_code = OVERFLOW;
         return 0;
@@ -44,22 +44,24 @@ boolean requests(int fd, const char * send, int length, char ** get) {
     int size = 0;
     while(length > 0) {
         size = write(fd, send, length);
+#if defined(LIBZEYE_DEBUG)
         fprintf(stderr, "write %d size\n", size);
+#endif
         length -= size;
     }
     /* Storage */
 #define DEFAULT_LEN 2048
     char * reading = NULL;
-    reading = malloc(DEFAULT_LEN);
+    reading = calloc(DEFAULT_LEN, 1);
     if (unlikely(reading == NULL))
-        return FALSE;
+        exit(-1);
     int r_len = DEFAULT_LEN;
     int r_less = r_len;
     /* Reading Buffer */
     int reads = 0;
-    char buffer[DEFAULT_LEN/2] = {0};
+    char buffer[DEFAULT_LEN/2+1] = {0};
     /* T T
-     * Using sleep : That is a Trick, Will Be fixed with epoll listen
+     * Using sleep : That is a Trick
      * For damn TCP Slice
      * */
     sleep(2);
@@ -68,12 +70,14 @@ boolean requests(int fd, const char * send, int length, char ** get) {
         buffer[reads] = '\0';
         if (r_less < reads && err_code == NORMAL) {
             r_less += expand_(&reading, &r_len);
+            if (unlikely(r_less < reads))
+                exit(-2);
         }else if (err_code == OVERFLOW){
             err_code = NORMAL;
             free(reading);
             return FALSE;
         }
-        strncat(reading, buffer, reads);
+        strcat(reading, buffer/*, reads*/);
         r_less -= reads;
         /* Read until there is nothing */
         if (reads != DEFAULT_LEN/2)
@@ -85,10 +89,12 @@ boolean requests(int fd, const char * send, int length, char ** get) {
             fputs("EPIPE!\n",stderr);
         if (EAGAIN == errno)
             fputs("EAGAIN\n", stderr);
+        free(reading);
         return FALSE;
     }
     else if (reads == 0) {
         //fprintf(stderr, "Read Nothing\n");
+        free(reading);
         return FALSE;
     }
     *get = reading;
@@ -107,6 +113,7 @@ int read_line(const char * stream, char * buf, int buf_len) {
 boolean deal_response(char * response , rep_status_t rep) {
     char local_buf[512] = {0};
     const char * start = response;
+    if (response == NULL) exit(-2);
     int readn = 0;
     int content_len = -1;
     int status_code = -1;
@@ -189,7 +196,7 @@ void match_err_detail(int err_code, char ** result) {
             len = strlen(local);
             break;
     }
-    *result = malloc(len);
+    *result = calloc(len, 1);
     if (unlikely(*result == NULL))
         return;
     strncpy(*result, local, len);

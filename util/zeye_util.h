@@ -12,7 +12,7 @@ struct zeye_user{
     int     last_err;   /* last Request error code */
     char *  err_detail; /* Request Error Detail */
     void *  comm_usr;   /* Something indead */
-    boolean consistency; /* Store it to the Disk ? */
+    boolean consistency; /* Store it(Account Info: access token) to the Disk ? */
 };
 typedef struct zeye_user * zeye_user_t;
 
@@ -32,6 +32,8 @@ typedef enum {
 
 /*
  * You should login before Anything
+ * @return if it return NULL, It means that your account is in error
+ *          check for Correct
  * */
 zeye_obj_t login(const char * username, const char * password, boolean consistency);
 /*

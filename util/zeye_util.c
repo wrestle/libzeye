@@ -40,7 +40,7 @@ zeye_obj_t login(const char * username, const char * password, boolean consisten
     user_t local = make_users(username, password);
     if (unlikely(local == NULL))
         return NULL;
-    zeye_user_t usr = malloc(sizeof(struct zeye_user));
+    zeye_user_t usr = calloc(sizeof(struct zeye_user), 1);
     if (unlikely(usr == NULL)) {
         destroy_users(local);
         return NULL;
@@ -48,7 +48,7 @@ zeye_obj_t login(const char * username, const char * password, boolean consisten
     usr->comm_usr = local;
     usr->err_detail = NULL;
     usr->last_err = 0;
-    zeye_obj_t zeye = malloc(sizeof(struct zeye_obj));
+    zeye_obj_t zeye = calloc(sizeof(struct zeye_obj), 1);
     if (unlikely(zeye == NULL)) {
         destroy_users(local);
         free(usr);

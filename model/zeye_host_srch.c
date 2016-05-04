@@ -19,7 +19,7 @@ make_query(const char * query, const char * page, const char * facet)
 {
 #define query_len (strlen(query)+strlen(page)+strlen(facet)+(22)+1)
     int sizes = query_len;
-    char *local = malloc(sizes);
+    char *local = calloc(sizes, 1);
     if (unlikely(local == NULL))
         return NULL;
     int writen = snprintf(local, sizes, "query=\"%s\"&page=%s&facet=%s", query, page, facet);
@@ -31,13 +31,13 @@ make_query(const char * query, const char * page, const char * facet)
 /*
  * Send Request and recv Response
  * */
-static const char *
+static char *
 make_request(const user_t user,
                           const char * model, const char * query, const char * attribute, /* host_search, query, Authorization */
                           const char * content) {
 #define res_len (strlen(model)+strlen(query)+strlen(api_uri)+strlen(attribute)+strlen(content)+42)
     int sizes = res_len;
-    char *local = malloc(sizes);
+    char *local = calloc(sizes, 1);
     if (unlikely(local == NULL))
         return NULL;
     /* Create Request Page */
@@ -66,8 +66,11 @@ static inline message search_in(const psearch s) {
     const char * facet = s->facet_attr;
     /* Make Complete query String include all Parameters(query, page, facet) */
     const char * quert_str = make_query(query, page, facet);
-    if (unlikely(quert_str == NULL))
-        return (message){.error_code = 0, .err_massage = NULL};
+    if (unlikely(quert_str == NULL)) {
+        char * tmp = calloc(1, 1);
+        *tmp = '\0';
+        return (message) {.error_code = 0, .err_massage = tmp};
+    }
     /* Send Request and recv Response */
     char * response = NULL;
 Retry:
@@ -88,7 +91,6 @@ Retry:
     //fprintf(stderr, "Receive(%d)(%d Byte/%d Byte): \n%s\n",status.status_code,strlen(response),status.content_length,response);
 
     /* End */
-    //free(response);
     return (message){.error_code = status.status_code, .err_massage = response};
 }
 

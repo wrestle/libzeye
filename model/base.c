@@ -29,7 +29,9 @@ static int make_connect() {
     if (p == NULL)
         exit(-1);
     freeaddrinfo(result);
+#if defined(LIBZEYE_DEBUG)
     fprintf(stderr, "Success Connection\n");
+#endif
     return client_;
 }
 
@@ -37,6 +39,21 @@ static int make_connect() {
  * Parse the access_token from json simply;
  * */
 static inline char* find_accecc(char * receive) {
+    /* Confirm if it is Okay */
+    char head[7] = {0};
+    int status_code = -1;
+    char detail[32] = {0};
+    char * status = strstr(receive, "\r\n");
+    *status = '\0';
+    sscanf(receive, "%s %d %s", head, &status_code, detail);
+    *status = '\r';
+    if (status_code >= 300 && status_code < 400)
+        return (char *)(SET_ACC_TOKEN_FAIL | URL_REDIR);
+    else if (status_code >= 400 && status_code < 500)
+        return (char *)(SET_ACC_TOKEN_FAIL | CLIENT_ERROR);
+    else if (status_code >= 500 && status_code < 600)
+        return (char *)(SET_ACC_TOKEN_FAIL | SERVER_ERROR);
+    /* Normal */
     char * p = strstr(receive, "\r\n\r\n");
     char * p1 = strchr(p, ' ');
     char * start = p1 + 2;
@@ -45,7 +62,7 @@ static inline char* find_accecc(char * receive) {
     return start;
 }
 
-static void set_access_token(user_t users) {
+static INFO_STATUS set_access_token(user_t users) {
 #define CONTENT_LEN 512
 #define BUF_LEN 1024
     /* Connect */
@@ -62,50 +79,61 @@ static void set_access_token(user_t users) {
     //fprintf(stderr, "Receive: \n%s\n", send_buf);
     /* Parse */
     char * start = find_accecc(send_buf);
+    /* Check For Error */
+    if (IS_SET_ERROR((int)(start)))
+        return GET_ERROR((int)(start));
 
 #define PREFIX_LEN 4
 #define ACCESS_TOKEN_LEN 173
-    char * access_token = malloc(PREFIX_LEN + ACCESS_TOKEN_LEN+1);
-    if (access_token == NULL)
-        ;
+    char * access_token = calloc(PREFIX_LEN + ACCESS_TOKEN_LEN+2, 1);
+    if (unlikely(access_token == NULL))
+        exit(-3);
     int writen = snprintf(access_token, PREFIX_LEN + ACCESS_TOKEN_LEN+1, "JWT %s", start);
     //fprintf(stderr, "Parse Accesstoken is (%d): %s\n", writen, access_token);
     assert(writen == 176);
     /* Store */
     users->access_token = access_token;
-    return;
+    return SET_ACC_TOKEN_SUCCESS;
 #undef PREFIX_LEN
 #undef ACCESS_TOKEN_LEN
 }
 
-static inline int set_username(user_t users, const char * name) {
+static inline INFO_STATUS set_username(user_t users, const char * name) {
     int len = strlen(name);
-    char * local = malloc(len + 1);
+    char * local = calloc(len + 1, 1);
     if(unlikely(local == NULL))
-        return -1;
+        return HEAP_OVERFLOW;
     strncpy(local, name, len);
     local[len] = '\0';
     users->username = local;
+    return SET_USR_NAME_SUCCESS;
 }
 
-static inline int set_password(user_t users, const char * pword) {
+static inline INFO_STATUS set_password(user_t users, const char * pword) {
     int len = strlen(pword);
-    char * local = malloc(len + 1);
+    char * local = calloc(len + 1, 1);
     if(unlikely(local == NULL))
-        return -1;
+        return HEAP_OVERFLOW;
     strncpy(local, pword, len);
     local[len] = '\0';
     users->password = local;
+    return SET_PASSWD_SUCCESS;
 }
 
 user_t make_users(const char * username, const char * password) {
     api_uri = "api.zoomeye.org";
-    user_t local = malloc(sizeof (struct user));
+    user_t local = calloc(sizeof (struct user), 1);
     if (unlikely(local == NULL))
         return NULL;
-    set_username(local, username);
-    set_password(local, password);
-    set_access_token(local);
+    INFO_STATUS result = -1;
+    result = set_username(local, username);
+    result = set_password(local, password);
+    result = set_access_token(local);
+    if (result != SET_ACC_TOKEN_SUCCESS)
+        return NULL;
+#if defined(LIBZEYE_DEBUG)
+    fprintf(stderr, "ACCESS_TOKEN: \n%s\n", local->access_token);
+#endif
     return local;
 }
 
@@ -114,11 +142,14 @@ void destroy_users(user_t frees) {
     free(frees->username);
     free(frees->password);
     close((int)frees->comm_hook);
+    free(frees);
 }
 
 void re_connect(user_t re) {
+    close((int)re->comm_hook);
     free(re->access_token);
     set_access_token(re);
+    //fprintf(stderr, "ACCESS_TOKEN: \n%s\n", re->access_token);
 }
 
 #if defined(WSX_RELEASE)

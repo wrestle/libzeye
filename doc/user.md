@@ -4,6 +4,8 @@
 
 		zeye_obj_t login(const char * username, const char * password, boolean consistency);
 
+	返回值是一个`zeye_obj_t`，每一个操作都需要传入这个类型的参数，`login`之后需要检查其是否为`NULL`，如果是则要查看自己的账号密码是否正确。
+
 2. 使用完毕后需要退出
 
 		void logout(zeye_obj_t);
