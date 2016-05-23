@@ -202,7 +202,7 @@ void match_err_detail(int err_code, char ** result) {
     strncpy(*result, local, len);
     return;
 }
-
+#if defined(JSON_DEPENDENCY)
 json_object* parse_response(const char * json) {
     json_object * parse = json_tokener_parse(json);
     if (unlikely(is_error(parse)))
@@ -213,3 +213,4 @@ json_object* parse_response(const char * json) {
 void rel_rep_data(json_object* free) {
     json_object_put(free);
 }
+#endif

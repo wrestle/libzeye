@@ -19,7 +19,9 @@ typedef struct zeye_user * zeye_user_t;
 /* It is about your Receive Data */
 typedef char * zeye_data;
 struct zeye_obj{
+#if defined(JSON_DEPENDENCY)
     json_object * parse_data;
+#endif
     zeye_data     raw_data;
     zeye_user_t   you;
 };
@@ -46,13 +48,14 @@ void logout(zeye_obj_t);
  *
  * */
 const zeye_data get_raw_data(const zeye_obj_t user);
+#if defined(JSON_DEPENDENCY)
 /*
  * Parse data which deal with the json-c
  * WARNING:
  * But You should take the responsibility to the json_object's memory manage.
  * */
 const json_object * get_parsed_data(const zeye_obj_t user);
-
+#endif
 
 /*
  * Get the HTTP Response Status Code

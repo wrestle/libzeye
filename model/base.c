@@ -73,10 +73,10 @@ static INFO_STATUS set_access_token(user_t users) {
                                               users->username, users->password);
 
     char send_buf[BUF_LEN] = {0};
-    snprintf(send_buf, BUF_LEN, "%sContent-length: %d\r\n\r\n%s", post_head, content_size, content);
+    snprintf(send_buf, BUF_LEN, "%sContent-length: %d\r\nConnection: keep-alive\r\n\r\n%s", post_head, content_size, content);
     send(client, send_buf, strnlen(send_buf, BUF_LEN), 0);
-    recv(client, send_buf, BUF_LEN, 0);
-    //fprintf(stderr, "Receive: \n%s\n", send_buf);
+    int err = recv(client, send_buf, BUF_LEN, 0);
+    fprintf(stderr, "Receive(%d): \n%s\n", err, send_buf);
     /* Parse */
     char * start = find_accecc(send_buf);
     /* Check For Error */

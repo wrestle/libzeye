@@ -15,6 +15,7 @@
 		boolean fetch_account_info(zeye_obj_t user);
 		boolean explore(zeye_obj_t user, zeye_search_t type,
                 const char * query, const char * page, const char * facet);
+4. 在上述主要操作之后，如果发生了错误(没有想要的结果)，可以用`get_status_code`和`get_status_detail`来获取相关信息。
 
 4. 主要数据结构为
 	1. `zeye_obj_t`: 控制所有的操作，信息存储。包含一个**用户信息**(`you`)，一个本次获取的原始数据`raw_data`，本次获取的原始数据经过处理后(`json-c`)的二次数据(`parse_data`)

@@ -8,9 +8,11 @@ const zeye_data get_raw_data(const zeye_obj_t user) {
     return user->raw_data;
 }
 
+#if defined(JSON_DEPENDENCY)
 const json_object * get_parsed_data(const zeye_obj_t user) {
     return json_object_get(user->parse_data);
 }
+#endif
 
 int get_status_code(const zeye_obj_t user) {
     return user->you->last_err;
@@ -30,10 +32,12 @@ static void clear(zeye_obj_t user) {
         free(user->raw_data);
         user->raw_data = NULL;
     }
+#if defined(JSON_DEPENDENCY)
     if (user->parse_data != NULL) {
         json_object_put(user->parse_data);
         user->parse_data = NULL;
     }
+#endif
 }
 
 zeye_obj_t login(const char * username, const char * password, boolean consistency) {
@@ -55,7 +59,9 @@ zeye_obj_t login(const char * username, const char * password, boolean consisten
         return NULL;
     }
     zeye->you = usr;
+#if defined(JSON_DEPENDENCY)
     zeye->parse_data = NULL;
+#endif
     zeye->raw_data   = NULL;
     return zeye;
 }
@@ -65,8 +71,10 @@ void logout(zeye_obj_t rel) {
     if (rel->you->err_detail != NULL)
         free(rel->you->err_detail);
     free(rel->you);
+#if defined(JSON_DEPENDENCY)
     if (rel->parse_data != NULL)
         json_object_put(rel->parse_data);
+#endif
     if (rel->raw_data != NULL)
         free(rel->raw_data);
     free(rel);
@@ -88,8 +96,10 @@ boolean fetch_account_info(zeye_obj_t user) {
     match_err_detail(tmp.error_code, &(user->you->err_detail));
     /* Raw data */
     user->raw_data   = tmp.err_massage;
+#if defined(JSON_DEPENDENCY)
     /* json-c data */
     user->parse_data = json_tokener_parse(tmp.err_massage);
+#endif
     if (200 == tmp.error_code || 201 == tmp.error_code)
         return TRUE;
     else
@@ -119,8 +129,10 @@ boolean explore(zeye_obj_t user, zeye_search_t type,
     match_err_detail(tmp.error_code, &(user->you->err_detail));
     /* Raw data */
     user->raw_data   = tmp.err_massage;
+#if defined(JSON_DEPENDENCY)
     /* json-c data */
     user->parse_data = json_tokener_parse(tmp.err_massage);
+#endif
     if (200 == tmp.error_code || 201 == tmp.error_code)
         return TRUE;
     else
