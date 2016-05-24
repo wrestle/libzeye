@@ -6,6 +6,8 @@
 #include <assert.h>
 #include "util.h"
 #include <errno.h>
+#include <stdlib.h>
+
 /* Not Thread safe */
 static int err_code = NORMAL;
 static const char * err_message[] = {

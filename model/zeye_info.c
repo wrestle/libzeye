@@ -58,8 +58,6 @@ Retry:
     struct rep_status status;
     deal_response(request, &status);
     //fprintf(stderr, "(%d): %s\n",status.status_code, request);
-
     /* End */
     return (message){.error_code = status.status_code, .err_massage = request};
-    //free(request);
 }

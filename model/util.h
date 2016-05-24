@@ -6,8 +6,11 @@
 #define LIBZEYE_UTIL_H
 
 #include "base.h"
+
+#if defined(JSON_DEPENDENCY)
 #include <json-c/json.h>
 #include <json-c/bits.h>
+#endif
 
 typedef struct {
     int    error_code;
@@ -45,6 +48,8 @@ boolean deal_response(char * response , rep_status_t rep);
 
 void match_err_detail(int err_code, char ** result);
 
+#if defined(JSON_DEPENDENCY)
 json_object* parse_response(const char * json);
 void rel_rep_data(json_object* free);
+#endif
 #endif //LIBZEYE_UTIL_H
