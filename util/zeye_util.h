@@ -1,7 +1,7 @@
 //
 // Created by root on 4/27/16.
 //
-
+// http://yqall02.baidupcs.com/file/384834062dc35867dbc1569ab06150ec?bkt=p3-00009781f1df78bc5c719356ba3c5f1add23&fid=873144231-250528-201776335713664&time=1476778854&sign=FDTAXGERLBH-DCb740ccc5511e5e8fedcff06b081203-Eite%2FZsR%2BGjvTi9qEdjq3DeK3MM%3D&to=yqhb&fm=Yan,B,U,nc&sta_dx=15825842&sta_cs=&sta_ft=gz&sta_ct=0&sta_mt=0&fm2=Yangquan,B,U,nc&newver=1&newfm=1&secfm=1&flow_ver=3&pkey=00009781f1df78bc5c719356ba3c5f1add23&sl=75956300&expires=8h&rt=sh&r=808906943&mlogid=6764910327606760817&vuk=873144231&vbdid=3749863503&fin=dpdk-16.07.tar.gz&fn=dpdk-16.07.tar.gz&slt=pm&uta=0&rtype=1&iv=0&isw=0&dp-logid=6764910327606760817&dp-callid=0.1.1&csl=600&csign=1xO%2BdO2iv2ZNIa6G28bYTdsJ8Hs%3D
 #ifndef LIBZEYE_ZEYE_UTIL_H
 #define LIBZEYE_ZEYE_UTIL_H
 
