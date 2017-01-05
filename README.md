@@ -1,5 +1,6 @@
-## libzeye
+## 本程序暂时废弃！
 
+## libzeye
 ### ZoomEye SDK - C 
 - C语言版的**SDK**
 
